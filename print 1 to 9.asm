@@ -1,17 +1,13 @@
 .model small
-
 .stack 100h
 .code 
  
 main proc
- 
  MOV AX,1
  MOV CX,9
  
- 
  my_loop:
-      
-      
+          
      MOV DL,CL
      ADD DL,48    
      MOV AH,2        ;print single CL value
@@ -23,10 +19,6 @@ main proc
     
  loop my_loop            
  
-         
-         
-         
-         
     MOV AH,4CH
     INT 21H 
          
