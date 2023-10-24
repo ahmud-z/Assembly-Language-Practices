@@ -1,13 +1,14 @@
+INCLUDE 'EMU8086.INC'
 .MODEL SMALL
 .STACK 100H
-
-
 .DATA 
 
-NUM1 DB ?
-NUM2 DB ?
 NUMBER DB ?
-TEMP DB 10
+RESULT DB ?
+REMAINDER DB ?
+TEMP DB 10 
+
+MSG DB 'Enter a two digit number: $'
 
 
 .CODE
@@ -17,52 +18,78 @@ MAIN PROC
     MOV AX,@DATA
     MOV DS,AX    
         
- 
-    MOV AH,1   
-    INT 21H         ;User Input First Digit
-    MOV NUM1,AL   
-
     
-       
-    
-    MOV AH,2
-    MOV DL,NUM1     ;Print User Input First Digit
+    MOV AH,9
+    MOV DX,OFFSET(MSG)
     INT 21H
     
      
-  
-    SUB AL,48 
-    MUL TEMP           ;Coverting      
+    MOV AH,1   
+    INT 21H       
+    SUB AL,48
+    
+     
+    MUL TEMP          
     MOV NUMBER,AL
-
-
-     
+    
      
     MOV AH,1   
-    INT 21H        ;User Input Second Digit
-    MOV NUM1,AL   
+    INT 21H      
+    SUB AL,48
+    
+     
+    ADD NUMBER,AL   
+    
+    
+    MOV AL,NUMBER
+    MOV BL,2
+    MOV AH,0
+    
+    
+    DIV BL      
+    
+    MOV RESULT,AL
+    MOV REMAINDER,AH   
+    
+          
+    MOV AH,2
+    MOV DL,0DH
+    INT 21H
+    MOV AH,2       ;PRINT A NEW LINE
+    MOV DL,0AH
+    INT 21H 
     
     MOV AH,2
-    MOV DL,NUM1    ;Print User Input Second Digit
+    MOV DL,0DH
     INT 21H
+    MOV AH,2       ;PRINT A NEW LINE
+    MOV DL,0AH
+    INT 21H 
     
-    
-    SUB AL,48 
-    ADD NUMBER,AL     ;Coverting in a single digit
-
+        
+    MOV BL,REMAINDER
      
-
-    MOV AL,0
-    MOV BL,2
-    MOV AL,NUMBER   ;This section doesn't work):
+ 
+    CMP BL,0
+    JLE IF
+    JG ELSE
     
-    DIV BL
-
-   
+    
+    IF:
+    PRINTN "The number is EVEN"   
+     
+    JMP END_IF 
+     
+     ELSE:
+        PRINTN "The number is ODD"
+     JMP END_IF
+               
+               
+    END_IF:       
  
     MOV AH,4CH
-    INT 21H    
-   
+    INT 21H
+       
     MAIN ENDP
-
     END MAIN
+    
