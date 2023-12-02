@@ -1,0 +1,50 @@
+.STACK 100H
+
+.DATA
+
+S_NAME DB 'NAME:AHMUDUL HOSSAIN $'
+S_ID DB 'ID:213002200 $'
+S_DEPT DB 'DEPARTMENT:CSE $'
+ 
+.CODE
+MAIN PROC
+    
+    MOV AX,@DATA
+    MOV DS,AX
+    
+
+    LEA DX,S_NAME ; LOAD THE FIRST ADDREESS OF STRING
+    CALL PRINT
+    
+    LEA DX,S_ID
+    CALL PRINT
+    
+    LEA DX,S_DEPT
+    CALL PRINT 
+    
+    
+    MOV AH,4CH
+    MOV AL,00H
+    INT 21H
+    
+    MAIN ENDP
+
+
+PRINT PROC
+    MOV AH,09H
+    INT 21H
+    
+    
+    MOV DL,10
+    MOV AH,02H
+    INT 21H
+                ;PRINT A NEW LINE    
+    ;MOV DL,13
+    ;MOV AH,02H
+    ;INT 21H
+    
+    RET
+    
+    PRINT ENDP
+
+END MAIN
