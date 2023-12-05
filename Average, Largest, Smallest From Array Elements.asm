@@ -1,58 +1,127 @@
+INCLUDE "EMU8086.INC"
+
 .STACK 100H
-
-.DATA
-
-ARR DB 1,8,7,2 
-
-MAX DB ?
-
-
+.DATA       
+    INPUTS DB ?
 
 .CODE
-MAIN PROC
+    MAIN PROC
+        
+        
+        MOV AX,@DATA
+        MOV DS,AX
+     
+        PRINT 'ENTER VALUES: '
+        
+        ;LOOPING 5 TIMES
+        MOV CX,5
+        MOV SI,0   
+        
+        TAKE_INPUT:
+            MOV AH,1
+            INT 21H
+            SUB AL,48
+            MOV INPUTS[SI],AL
+            INC SI
+            PRINT " "
+            LOOP TAKE_INPUT 
+        PRINTN ""
+        
+        CALL FIND_LARGEST
+        PRINT "LARGEST: "
+        MOV AH,2
+        MOV DL,AL
+        INT 21H
+        PRINTN ""
+        
+        CALL FIND_SMALLEST
+        PRINT "SMALLEST: "
+        MOV AH,2
+        MOV DL,AL
+        INT 21H
+        PRINTN ""
+        
+        CALL FIND_AVERAGE
+        PRINT "AVERAGE: "
+        MOV AH,2
+        MOV DL,AL
+        INT 21H
+        PRINTN "" 
     
-    MOV AX,@DATA
-    MOV DS,AX
+    HLT
     
-    MOV CX,4
-    MOV SI,0
-
-    MOV AL, ARR[SI]         
-    MOV MAX,AL
-
-    FIRST_LOOP:
-
-    MOV DL,ARR[SI]    
-
-    CMP DL, MAX    ; Compare DL (current element) with MAX
-    JLE NOT_GREATER  ; Jump if NOT greater or equal (i.e., if DL is less than or equal to MAX)
-
-    ; If DL is greater than MAX, update MAX
-    MOV AL, DL
-    MOV MAX, AL
-
-    NOT_GREATER:
-
-    ADD DL, 48
-
-    MOV AH,02H
-    INT 21H
-
-    MOV AH,2
-    MOV DL,20h      ;Print Single Space
-    INT 21H
-
-    INC SI
-
-    LOOP FIRST_LOOP 
-
-    MOV DL, MAX
-    ADD DL, 48
-    MOV AH,02H
-    INT 21H
-
-    MOV AH,4CH
-    INT 21H  
+    FIND_LARGEST PROC
+            
+        MOV SI,0
+        MOV CX,4
+        
+        MOV AL, INPUTS[SI] ;STORE THE BIGGEST
+        
+        
+        CHECK_LARGER:
+            INC SI
+            CMP INPUTS[SI],AL
+            
+            JG SET_LARGEST
+            JNG CONT_LOOP
+            
+        SET_LARGEST:
+            MOV AL, INPUTS[SI]
+            
+            
+        CONT_LOOP:
+            LOOP CHECK_LARGER
+        
+        ADD AL,48
+        
+        RET
+    ENDP FIND_LARGEST
     
-MAIN ENDP
-END MAIN
+    FIND_SMALLEST PROC
+            
+        MOV SI,0
+        MOV CX,4
+        MOV AL, INPUTS[SI] ;STORE THE SMALLEST
+        
+        
+        CHECK_SMALLEST:
+            INC SI
+            CMP INPUTS[SI],AL
+            JL SET_SMALLEST
+            JG CONT_SMALL_LOOP
+            
+        SET_SMALLEST:
+            MOV AL, INPUTS[SI]
+            
+        CONT_SMALL_LOOP:
+            LOOP CHECK_SMALLEST
+        
+        ADD AL,48
+        
+        RET
+    ENDP FIND_SMALLEST 
+
+
+    FIND_AVERAGE PROC
+            
+        MOV SI,0
+        MOV CX,5
+        
+        MOV BL,0 ;STORE THE SUM 
+        
+        CALCULATE_SUM:
+            MOV AL, INPUTS[SI]
+            ADD BL, AL
+            INC SI
+            LOOP CALCULATE_SUM
+        
+             
+        MOV AX, BX
+        MOV BL, 5 ; Divide by
+        DIV BL
+         
+        ADD AL, 48 ; Convert to print as ascii
+        
+        RET
+
+    ENDP FIND_AVERAGE
