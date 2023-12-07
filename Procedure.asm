@@ -4,7 +4,9 @@
 
 S_NAME DB 'NAME:AHMUDUL HOSSAIN $'
 S_ID DB 'ID:213002200 $'
-S_DEPT DB 'DEPARTMENT:CSE $'
+S_DEPT DB 'DEPT:CSE $'
+S_UNI DB 'GREEN UNIVERSITY OF BANGLADESH $'
+S_LOCATION DB 'PURBACAL, AMERICAN CITY $'
  
 .CODE
 MAIN PROC
@@ -13,13 +15,19 @@ MAIN PROC
     MOV DS,AX
     
 
-    LEA DX,S_NAME ; LOAD THE FIRST ADDREESS OF STRING
+    LEA DX,S_NAME
     CALL PRINT
     
     LEA DX,S_ID
     CALL PRINT
     
     LEA DX,S_DEPT
+    CALL PRINT 
+    
+    LEA DX,S_UNI
+    CALL PRINT 
+    
+    LEA DX,S_LOCATION
     CALL PRINT 
     
     
@@ -39,9 +47,17 @@ PRINT PROC
     MOV AH,02H
     INT 21H
                 ;PRINT A NEW LINE    
-    ;MOV DL,13
-    ;MOV AH,02H
-    ;INT 21H
+    MOV DL,13
+    MOV AH,02H
+    INT 21H 
+    
+    MOV DL,10
+    MOV AH,02H
+    INT 21H
+                ;PRINT A NEW LINE    
+    MOV DL,13
+    MOV AH,02H
+    INT 21H
     
     RET
     
