@@ -1,6 +1,5 @@
+
 INCLUDE 'EMU8086.INC'
-
-
 .STACK 100H
 
 .DATA
@@ -10,18 +9,22 @@ INCLUDE 'EMU8086.INC'
     
     ALERT_MSG1 DB 'MATCHED$'
     ALERT_MSG2 DB 'NOT MATCHED$'
+   
+    FINAL_CONCAT_STR DB 100 DUP('$')
     
+    MSG DB 'HELLO',0 
     
-    MSG DB 'HELLO',0
+    STRING DB 'HELLO WORLD$'
+    
+    MSG1 DB 'HELLO$'
+    MSG2 DB ' ASSEMBLY$'
     
     INPUT_MSG1 DB 100 DUP('$')  
     INPUT_MSG2 DB 100 DUP('$')
-    
-    
+          
     NEW_LINE DB 0AH,0DH,"$"
     
     LENGTH DB ?
-    
 
 .CODE
 
@@ -64,19 +67,20 @@ CHOSE_OPT:
    PRINT "CHOOSE A OPTION: "
       
     MOV AH,01H
-    INT 21H   
+    INT 21H     
+    
     
     CMP AL,49
-    JE FIND_LENGTH   
+    JE FIND_LENGTH
+    
+    CMP AL,50
+    JE STR_CONCAT   
 
     CMP AL,51
     JE STR_COMPARE
     
     CMP AL,52
-    JE REVERSE_STRING
-
-
- 
+    JE STR_REVERSE
     
 FIND_LENGTH:   
     MOV SI,OFFSET MSG
@@ -88,9 +92,7 @@ CALC_LENGTH:
     JE PRINT_LENGTH
     INC CX
     INC SI     
-    JMP CALC_LENGTH 
-    
- 
+    JMP CALC_LENGTH  
  
 PRINT_LENGTH: 
         LEA DX, NEW_LINE
@@ -110,33 +112,7 @@ PRINT_LENGTH:
   INT 21H       
             
 MAIN ENDP 
-
-
- 
- 
-
-TAKE_STR_INPUT PROC 
-        
-    PRINT "ENTER FIRST STRING: "
-    MOV AH, 0AH         ; Function to read input into buffer
-    LEA DX, INPUT_MSG1     ; DX points to the buffer
-    INT 21H             ; Call DOS interrupt
-
-    LEA DX, NEW_LINE
-    MOV AH, 09H
-    INT 21H
    
-    PRINT "ENTER SECOND STRING: "
-    
-    MOV AH, 0AH         ; Function to read input into buffer
-    LEA DX, INPUT_MSG2     ; DX points to the buffer
-    INT 21H             ; Call DOS interrupt
-
-TAKE_STR_INPUT ENDP
-    
-
-
-     
      
 PRINT_MSG PROC
                          
@@ -150,31 +126,6 @@ RET
 PRINT_MSG ENDP
      
 
-REVERSE_STRING PROC
-        
-        MOV DI,OFFSET(MSG)
-        MOV CX,5
-        
-        
-        PRINT_REVERSE:
-            
-            CMP [SI],0
-            JE END
-            
-            MOV AH,2
-            MOV DL,[SI]
-            INT 21H
-            
-            INC SI
-            
-        JMP PRINT_REVERSE           
- 
- REVERSE_STRING ENDP           
-                     
-                     
-                     
- 
- 
 STR_COMPARE PROC
         
     MOV SI, OFFSET CMP_MSG1 
@@ -210,5 +161,90 @@ ELSE:
     CALL PRINT_MSG
     JMP END
     
-STR_COMPARE ENDP                     
+STR_COMPARE ENDP
+
+
+STR_CONCAT PROC
+    
+    MOV SI, OFFSET MSG1
+    MOV DI, OFFSET FINAL_CONCAT_STR
+
+    L1:
+        MOV AL, [SI]
+        CMP AL, '$'
+
+        JE EXIT1
+
+        MOV [DI], AL
+
+        INC SI
+        INC DI
+        JMP L1
+
+    EXIT1:
+
+    MOV SI, OFFSET MSG2
+    L2:
+
+        MOV AL, [SI]
+        CMP AL, '$'
+
+        JE EXIT2
+
+        MOV [DI], AL
+
+        INC SI
+        INC DI
+        JMP L2
+
+    EXIT2:
+
+    LEA DX,NEW_LINE
+    MOV AH,09H
+    INT 21H
+    
+    PRINT "CONCATED STRING: "
+    
+    MOV [DI], '$'
+
+    MOV DX, OFFSET FINAL_CONCAT_STR
+    MOV AH, 09H
+    INT 21H
+ 
+    JMP END
+       
+    STR_CONCAT ENDP
+
+STR_REVERSE PROC
+        
+    MOV SI,OFFSET STRING
+    MOV CX,11
+
+LOOP1:
+    MOV BX,[SI]
+    PUSH BX
+    INC SI
+
+LOOP LOOP1
+
+    MOV CX,11
+    LEA DX, NEW_LINE
+    MOV AH, 09H
+    INT 21H 
+       
+     PRINT "INPUT STRING: HELLO WORLD"      
+       
+    LEA DX, NEW_LINE
+    MOV AH, 09H
+    INT 21H 
+       
+    PRINT "REVERSE STRING: "
+
+LOOP2:
+    POP DX
+    MOV AH, 02H
+    INT 21H
+LOOP LOOP2
+
+JMP END
 END MAIN
