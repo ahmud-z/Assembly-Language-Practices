@@ -5,16 +5,23 @@ INCLUDE 'EMU8086.INC'
 
 .DATA
     
-    MSG DB 'HELLO WORLD',0
+    CMP_MSG1 DB 'HELLO',0
+    CMP_MSG2 DB 'WORLD',0
     
-    CMP_MSG1 'HELLO'
-    CMP_MSG2 'HELLO'
+    ALERT_MSG1 DB 'MATCHED$'
+    ALERT_MSG2 DB 'NOT MATCHED$'
+    
+    
+    MSG DB 'HELLO',0
+    
+    INPUT_MSG1 DB 100 DUP('$')  
+    INPUT_MSG2 DB 100 DUP('$')
+    
     
     NEW_LINE DB 0AH,0DH,"$"
     
     LENGTH DB ?
     
-
 
 .CODE
 
@@ -53,48 +60,155 @@ CHOSE_OPT:
     LEA DX,NEW_LINE
     MOV AH,09H
     INT 21H
-    
-    
+       
    PRINT "CHOOSE A OPTION: "
-     
-    
+      
     MOV AH,01H
     INT 21H   
     
     CMP AL,49
-    JE FIND_LENGTH
-    
+    JE FIND_LENGTH   
 
     CMP AL,51
-    JE COMP_STR
+    JE STR_COMPARE
+    
+    CMP AL,52
+    JE REVERSE_STRING
 
 
-
-    FIND_LENGTH:
-        
-        MOV SI,OFFSET MSG
-        MOV CX,0
+ 
+    
+FIND_LENGTH:   
+    MOV SI,OFFSET MSG
+    MOV CX,0       
             
-        
- 
-    CALC_LENGTH:
-      
-     CMP [SI],0
+CALC_LENGTH:
+  
+    CMP [SI],0
+    JE PRINT_LENGTH
+    INC CX
+    INC SI     
+    JMP CALC_LENGTH 
     
-     JE END
-    
-     INC CX
-     INC SI 
+ 
+ 
+PRINT_LENGTH: 
+        LEA DX, NEW_LINE
+        MOV AH, 09H
+        INT 21H
         
-    JMP CALC_LENGTH   
- 
- 
+        PRINT "LENGTH OF GIVEN STRING: "
+        MOV LENGTH,CL
+        ADD LENGTH,48 
+         
+        MOV DL,LENGTH
+        MOV AH,2
+        INT 21H
+        JMP END
  END:
- 
-  MOV LENGTH,CL
   MOV AH,04H
-  INT 21H    
-   
+  INT 21H       
             
-MAIN ENDP           
+MAIN ENDP 
+
+
+ 
+ 
+
+TAKE_STR_INPUT PROC 
+        
+    PRINT "ENTER FIRST STRING: "
+    MOV AH, 0AH         ; Function to read input into buffer
+    LEA DX, INPUT_MSG1     ; DX points to the buffer
+    INT 21H             ; Call DOS interrupt
+
+    LEA DX, NEW_LINE
+    MOV AH, 09H
+    INT 21H
+   
+    PRINT "ENTER SECOND STRING: "
+    
+    MOV AH, 0AH         ; Function to read input into buffer
+    LEA DX, INPUT_MSG2     ; DX points to the buffer
+    INT 21H             ; Call DOS interrupt
+
+TAKE_STR_INPUT ENDP
+    
+
+
+     
+     
+PRINT_MSG PROC
+                         
+        MOV AH,09H  
+        INT 21H
+                            
+        LEA DX, NEW_LINE
+        MOV AH, 09H
+        INT 21H                             
+RET           
+PRINT_MSG ENDP
+     
+
+REVERSE_STRING PROC
+        
+        MOV DI,OFFSET(MSG)
+        MOV CX,5
+        
+        
+        PRINT_REVERSE:
+            
+            CMP [SI],0
+            JE END
+            
+            MOV AH,2
+            MOV DL,[SI]
+            INT 21H
+            
+            INC SI
+            
+        JMP PRINT_REVERSE           
+ 
+ REVERSE_STRING ENDP           
+                     
+                     
+                     
+ 
+ 
+STR_COMPARE PROC
+        
+    MOV SI, OFFSET CMP_MSG1 
+    MOV DI, OFFSET CMP_MSG2
+    
+CHECK:
+    MOV AL, [SI]       
+    CMP AL, [DI]       
+    JNE IF    
+    
+    CMP AL, 0
+    JE ELSE
+
+    INC SI             
+    INC DI           
+    JMP CHECK 
+
+IF:  
+    LEA DX, NEW_LINE
+    MOV AH, 09H
+    INT 21H
+         
+    LEA DX,ALERT_MSG2
+    CALL PRINT_MSG
+    JMP END
+
+ELSE:
+    LEA DX, NEW_LINE
+    MOV AH, 09H
+    INT 21H
+    
+    LEA DX,ALERT_MSG1
+    CALL PRINT_MSG
+    JMP END
+    
+STR_COMPARE ENDP                     
 END MAIN
