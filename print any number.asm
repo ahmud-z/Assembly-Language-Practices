@@ -1,0 +1,51 @@
+
+INCLUDE 'EMU8086.INC'
+.STACK 100H
+.DATA
+
+NUM DW 10000
+
+DIGIT_BUFFER DB 6 DUP ('$') 
+
+.CODE
+
+MAIN PROC
+
+    MOV AX, @DATA
+    MOV DS, AX
+
+    MOV AH, 0  ; Clear AH register
+    MOV AX, NUM
+    CALL PRINT_NUMBER
+    
+
+    MOV AH, 4CH
+    INT 21H
+
+MAIN ENDP 
+
+
+PRINT_NUMBER PROC
+    
+    MOV CX, 10  ; Set divisor to 10
+    MOV BX, OFFSET DIGIT_BUFFER + 5 
+
+CONVERT_LOOP:
+    XOR DX, DX
+    DIV CX
+    ADD DL, '0'
+    DEC BX
+    MOV [BX], DL
+    TEST AL, AL
+    JNZ CONVERT_LOOP
+
+    MOV AH, 9
+    MOV DX, BX
+    INT 21H 
+    
+    RET
+    
+    PRINT_NUMBER ENDP
+
+
+END MAIN
