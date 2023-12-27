@@ -20,17 +20,14 @@ MAIN PROC
     MOV AH,9
     MOV DX,OFFSET(MSG)
     INT 21H
-    
-     
+
     MOV AH,1   
     INT 21H       
-    SUB AL,48
-    
+    SUB AL,48 
   
     MOV BL,2
     MOV AH,0
-    
-    
+
     DIV BL      
     
     MOV RESULT,AL
@@ -51,15 +48,12 @@ MAIN PROC
     MOV DL,0AH
     INT 21H 
     
-        
     MOV BL,REMAINDER
-     
- 
+
     CMP BL,0
     JLE IF
     JG ELSE
-    
-    
+
     IF:
     PRINTN "THE NUMBER IS EVEN"   
      
@@ -68,8 +62,7 @@ MAIN PROC
      ELSE:
         PRINTN "THE NUMBER IS ODD"
      JMP END_IF
-               
-               
+          
     END_IF:       
  
     MOV AH,4CH
