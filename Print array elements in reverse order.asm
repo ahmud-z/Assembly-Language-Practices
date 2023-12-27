@@ -3,6 +3,7 @@
 .DATA
 
 ARR DB 1,2,3,4,5 
+SZ equ $ - ARR
 
 MSG1 DB 'ARRAY ELEMENTS: $'
 MSG2 DB 'ELEMENTS IN REVERSE ORDER: $'
@@ -14,17 +15,14 @@ MAIN PROC
     
     MOV AX,@DATA
     MOV DS,AX
-      
-    
-    MOV CX,5
-    MOV SI,0
-    
-    
+        
+    MOV CX,SZ
+    MOV SI, 0
+   
     MOV AH,9
     MOV DX,OFFSET(MSG1)  ;Print msg
     INT 21H   
-    
-        
+     
     FIRST_LOOP:
     
     MOV DL,[SI]
@@ -37,10 +35,8 @@ MAIN PROC
     INT 21H
     
     INC SI 
-    
-    LOOP FIRST_LOOP 
-      
-      
+
+    LOOP FIRST_LOOP   
     MOV DL,10
     MOV AH,02H
     INT 21H
@@ -49,7 +45,7 @@ MAIN PROC
     MOV AH,02H
     INT 21H  
 
-MOV DL,10
+    MOV DL,10
     MOV AH,02H
     INT 21H
                 ;PRINT A NEW LINE    
@@ -57,10 +53,9 @@ MOV DL,10
     MOV AH,02H
     INT 21H      
       
-    MOV CX,5      
-    MOV SI, 4
-    
-    
+    MOV CX,SZ
+    MOV SI, SZ-1
+ 
     MOV AH,9
     MOV DX,OFFSET(MSG2)  ;print msg
     INT 21H 
